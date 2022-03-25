@@ -38,7 +38,7 @@ async function install() {
     await toolCache.downloadTool(url, binaryPath);
 
     if (process.platform == "linux" || process.platform == "darwin") {
-        fs.chmod(binaryPath, 0o755);
+        fs.chmodSync(binaryPath, 0o755);
     }
 
     // Expose the tool by adding it to the PATH
