@@ -47,7 +47,7 @@ async function install() {
 	const romeDirectory = path.join(_getTempDirectory(), ".rome_bin");
 	const romeBinary = path.join(romeDirectory, `rome${getBinaryExtension()}`);
 
-	core.debug("Download tool from '${url}'");
+	core.debug(`Download tool from '${url}' to ${romeBinary}.`);
 	await toolCache.downloadTool(url, romeBinary);
 
 	if (process.platform == "linux" || process.platform == "darwin") {
@@ -94,8 +94,7 @@ function getBinaryExtension() {
 // Retrieves the temp directory. Copied from @actions/tool-cache
 function _getTempDirectory() {
 	io.mkdirP();
-	const tempDirectory = process.env["RUNNER_TEMP"] || "";
-	return tempDirectory;
+	return process.env["RUNNER_TEMP"] || "";
 }
 
 module.exports = main;
