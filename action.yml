@@ -8,6 +8,10 @@ inputs:
   preview:
     description: "Whether to install preview versions of Rome."
     default: false
+  github-token:
+    description: The GitHub token used to create an authenticated client
+    default: ${{ github.token }}
+    required: false
 runs:
   using: "node16"
   main: "dist/index.js"

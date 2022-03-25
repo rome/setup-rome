@@ -5,7 +5,8 @@
   "main": "index.js",
   "private": true,
   "scripts": {
-    "build": "npx ncc build index.js --license LICENSE"
+    "build": "ncc build index.js --license LICENSE",
+    "start": "ncc build --watch index.js --license LICENSE"
   },
   "keywords": [
     "actions",

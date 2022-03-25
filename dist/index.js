@@ -4,75 +4,154 @@
 /***/ 2932:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-const core = __nccwpck_require__(2186);
-const github = __nccwpck_require__(5438);
+const fs = __nccwpck_require__(7147);
+const path = __nccwpck_require__(1017);
 const process = __nccwpck_require__(7282);
-const toolCache = __nccwpck_require__(7784);
-const io = __nccwpck_require__(7436);
 
-const OS = process.env['RUNNER_OS'];
-const ARCH = process.env['RUNNER_ARCH'];
+const core = __nccwpck_require__(2186);
+const io = __nccwpck_require__(7436);
+const github = __nccwpck_require__(5438);
+const toolCache = __nccwpck_require__(7784);
+
+const ARCH = process.env["RUNNER_ARCH"].toLowerCase();
 
 async function main() {
-    console.log("Hello");
-    try {
-        let path = await io.which("rome", true);
-        core.info(`Use pre-installed Rome ${path}`);
-    } catch {
-        core.info("Rome is not installed, installing it now...");
-        try {
-            core.startGroup("Installing Rome");
-            await install();
-        } finally {
-            core.endGroup();
-        }
-    }
+	const romePath = await resolveRome();
+
+	if (romePath == null) {
+		core.info("Rome is not installed, installing it now...");
+		try {
+			core.startGroup("Installing Rome");
+			await install();
+		} finally {
+			core.endGroup();
+		}
+	} else {
+		core.info(`Use pre-installed Rome ${romePath}`);
+	}
 }
 
+/**
+ * Resolves the path to the rome binary.
+ * @returns {PromiseLike<string | null>} the path to the Rome binary or `null` if Rome isn't installed
+ */
+async function resolveRome() {
+	try {
+		return await io.which("rome", true);
+	} catch {
+		return null;
+	}
+}
+
+/**
+ * Installs rome and adds it to the path.
+ */
 async function install() {
-    // Get version of tool to be installed
-    const url = await getDownloadUrl();
+	// Get version of tool to be installed
+	const url = await getDownloadUrl();
 
-    core.debug("Download tool from '${url}'");
-    // Download the specific version of the tool, e.g. as a tarball
-    const pathToBinary = await toolCache.downloadTool(url, getBinaryName());
+	// Create a temp directory because `addPath` adds the directory and not the binary to the path.
+	const romeDirectory = path.join(_getTempDirectory(), ".rome_bin");
+	const romeBinary = path.join(romeDirectory, `rome${getBinaryExtension()}`);
 
-    // Expose the tool by adding it to the PATH
-    core.addPath(pathToBinary)
-}
+	core.debug(`Download tool from '${url}' to ${romeBinary}.`);
+	await toolCache.downloadTool(url, romeBinary);
 
-function getBinaryName() {
-    if (isWindows()) {
-        return "rome.exe"
-    }
+	if (process.platform == "linux" || process.platform == "darwin") {
+		fs.chmodSync(romeBinary, 0o755);
+	}
 
-    return "rome";
-}
-
-function isWindows() {
-    return ARCH === "windows";
+	// Expose the tool by adding it to the PATH
+	core.addPath(romeDirectory);
 }
 
 async function getDownloadUrl() {
-    const preview = core.getInput('preview');
+	const binaryName = `${getDownloadBinaryBaseName()}${getBinaryExtension()}`;
+	const tagName = await resolveReleaseTagName();
 
-    core.debug(OS);
-    core.debug(ARCH);
-
-    let extension = "";
-
-    if (isWindows()) {
-        extension = ".exe"
-    }
-
-    let url = `https://github.com/rome/tools/releases/download/v0.1.20220324/rome-linux/${encodeURIComponent(OS)}-${encodeURIComponent(ARCH)}${extension}`;
-
-
-
-    return url;
+	return `https://github.com/rome/tools/releases/download/${encodeURIComponent(
+		tagName,
+	)}/${encodeURIComponent(binaryName)}`;
 }
 
-module.exports = main
+async function resolveReleaseTagName() {
+	if (!core.getBooleanInput("preview")) {
+		return "latest";
+	}
+
+	const token = core.getInput("github-token", { required: true });
+	const octokit = github.getOctokit(token);
+
+	const { repository } = await octokit.graphql(
+		`
+    { 
+        repository(owner: "rome", name: "tools") {
+            releases(orderBy: { field:CREATED_AT, direction:DESC }, first: 100) {
+                nodes {
+                    isPrerelease
+                    tagName
+                }
+            }
+        }
+    }`,
+		{},
+	);
+
+	const releases = repository?.releases?.nodes;
+
+	if (releases == null) {
+		throw new Error("Failed to retrieve the list of releases");
+	}
+
+	const firstPreRelease = releases.find((release) => release.isPrerelease);
+
+	if (firstPreRelease == null) {
+		core.error("Failed to retrieve pre-release, falling back to latest.");
+		return "latest";
+	}
+
+	return firstPreRelease.tagName;
+}
+
+function getDownloadBinaryBaseName() {
+	switch (process.platform) {
+		case "win32":
+		case "linux":
+		case "darwin":
+			return `rome-${process.platform}-${ARCH}`;
+
+		default:
+			core.error(`Unsupported platform ${process.platform}`);
+			throw new Error("Unsupported platform");
+	}
+}
+
+function getBinaryExtension() {
+	if (process.platform == "win32") {
+		return ".exe";
+	}
+	return "";
+}
+
+// Retrieves the temp directory. Copied from @actions/tool-cache
+function _getTempDirectory() {
+	const tempDirectory = process.env["RUNNER_TEMP"];
+
+	if (tempDirectory == null) {
+		core.warning(
+			"Temp directory not exposed via 'RUNNER_TEMP' environment variable. Uses current directory instead.",
+		);
+		return "";
+	}
+	return tempDirectory;
+}
+
+module.exports = main;
+
+if (require.main === require.cache[eval('__filename')]) {
+	main();
+}
+
 
 /***/ }),
 
