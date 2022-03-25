@@ -55,7 +55,6 @@ async function install() {
 		fs.chmodSync(romeBinary, 0o755);
 	}
 
-	// Expose the tool by adding it to the PATH
 	core.addPath(romeDirectory);
 }
 

@@ -1,6 +1,6 @@
 on: [pull_request, push]
 jobs:
-  main:
+  test:
     strategy:
       matrix:
         os: ["ubuntu-latest", "macos-latest", "windows-latest"]
@@ -16,3 +16,24 @@ jobs:
 
       - name: Run Rome
         run: rome --help
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Backup original 'index.js'
+        run: cp dist/index.js dist/index.original.js
+
+      - name: Build dist files
+        run: npm run build
+
+      - name: Verify dist files are identical
+        run: |
+          DIFF=$(diff ./dist/index.js ./dist/index.original.js)
+          if [ "$DIFF" != "" ] 
+          then
+            echo "Please re-build the index.js file with 'npm run build' and commit the changed files in the 'dist' directory."
+            echo "$DIFF"
+            exit 1
+          fi
