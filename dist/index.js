@@ -87,7 +87,7 @@ async function resolveReleaseTagName() {
 	const token = core.getInput("github-token", { required: true });
 	const octokit = github.getOctokit(token);
 
-	const { repository: { releases } } = await octokit.graphql(
+	const { repository } = await octokit.graphql(
 		`
     { 
         repository(owner: "rome", name: "tools") {
@@ -101,6 +101,12 @@ async function resolveReleaseTagName() {
     }`,
 		{},
 	);
+
+	const releases = repository?.releases?.nodes;
+
+	if (releases == null) {
+		throw new Error("Failed to retrieve the list of releases");
+	}
 
 	core.debug(JSON.stringify(releases, null, " "));
 
