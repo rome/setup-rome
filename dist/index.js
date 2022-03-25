@@ -14,6 +14,7 @@ const OS = process.env['RUNNER_OS'];
 const ARCH = process.env['RUNNER_ARCH'];
 
 async function main() {
+    console.log("Hello");
     try {
         let path = await io.which("rome", true);
         core.info(`Use pre-installed Rome ${path}`);
