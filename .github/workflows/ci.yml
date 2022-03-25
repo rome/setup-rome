@@ -27,7 +27,7 @@ jobs:
 
       - name: Build dist files
         run: |
-          npm install
+          npm ci
           npm run build
 
       - name: Verify dist files are identical
