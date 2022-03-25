@@ -99,8 +99,15 @@ function getBinaryExtension() {
 
 // Retrieves the temp directory. Copied from @actions/tool-cache
 function _getTempDirectory() {
-	io.mkdirP();
-	return process.env["RUNNER_TEMP"] || "";
+	const tempDirectory = process.env["RUNNER_TEMP"];
+
+	if (tempDirectory == null) {
+		core.warning(
+			"Temp directory not exposed via 'RUNNER_TEMP' environment variable. Uses current directory instead.",
+		);
+		return "";
+	}
+	return tempDirectory;
 }
 
 module.exports = main;
