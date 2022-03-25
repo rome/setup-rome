@@ -110,11 +110,14 @@ async function resolveReleaseTagName() {
 
 	core.debug(JSON.stringify(releases, null, " "));
 
-	const firstPreRelease = releases.find(
-		(release) => release.prerelease === true,
-	);
-	core.debug(JSON.stringify(firstPreRelease, null, "  "));
-	return firstPreRelease.tag;
+	const firstPreRelease = releases.find((release) => release.isPrerelease);
+
+	if (firstPreRelease == null) {
+		core.error("Failed to retrieve pre-release, falling back to latest.");
+		return "latest";
+	}
+
+	return firstPreRelease.tagName;
 }
 
 function getDownloadBinaryBaseName() {
