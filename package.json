@@ -1,5 +1,5 @@
 {
-  "name": "gh-setup-rome",
+  "name": "setup-rome",
   "version": "0.0.1",
   "description": "\"GitHub Action to install Rome\"",
   "main": "index.js",

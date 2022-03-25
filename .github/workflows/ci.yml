@@ -1,0 +1,17 @@
+on: [pull_request, push]
+
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install Rome
+        id: hello
+        uses: octocat/setup-rome
+        with:
+          preview: true
+
+      - name: Run Rome
+        run: rome --help
