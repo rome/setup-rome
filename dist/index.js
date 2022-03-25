@@ -4,13 +4,14 @@
 /***/ 2932:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-const core = __nccwpck_require__(2186);
-const github = __nccwpck_require__(5438);
-const process = __nccwpck_require__(7282);
-const toolCache = __nccwpck_require__(7784);
-const io = __nccwpck_require__(7436);
-const path = __nccwpck_require__(1017);
 const fs = __nccwpck_require__(7147);
+const path = __nccwpck_require__(1017);
+const process = __nccwpck_require__(7282);
+
+const core = __nccwpck_require__(2186);
+const io = __nccwpck_require__(7436);
+const github = __nccwpck_require__(5438);
+const toolCache = __nccwpck_require__(7784);
 
 const ARCH = process.env["RUNNER_ARCH"].toLowerCase();
 
@@ -71,10 +72,33 @@ async function getDownloadUrl() {
 	core.debug(`Architecture: ${ARCH}`);
 
 	const binaryName = `${getDownloadBinaryBaseName()}${getBinaryExtension()}`;
+	const tagName = await resolveReleaseTagName();
 
-	return `https://github.com/rome/tools/releases/download/v0.1.20220324/${encodeURIComponent(
-		binaryName,
-	)}`;
+	return `https://github.com/rome/tools/releases/download/${encodeURIComponent(
+		tagName,
+	)}/${encodeURIComponent(binaryName)}`;
+}
+
+async function resolveReleaseTagName() {
+	if (!core.getBooleanInput("preview")) {
+		return "latest";
+	}
+
+	const token = core.getInput("github-token", { required: true });
+	const octokit = github.getOctokit(token);
+
+	const releases = await octokit.rest.repos.listReleases({
+		owner: "rome",
+		repo: "tools",
+	});
+
+	core.debug(JSON.stringify(releases, null, " "));
+
+	const firstPreRelease = releases.find(
+		(release) => release.prerelease === true,
+	);
+	core.debug(JSON.stringify(firstPreRelease, null, "  "));
+	return firstPreRelease.tag;
 }
 
 function getDownloadBinaryBaseName() {
