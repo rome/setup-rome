@@ -36,5 +36,4 @@ jobs:
           DIFF=$(diff ./dist/index.js ./dist/index.original.js)
           if [ "$DIFF" != "" ]; then
             echo "Please re-build the index.js file with 'npm run build' and commit the changed files in the 'dist' directory." 
-            echo "$DIFF" 
           fi
