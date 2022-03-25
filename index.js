@@ -60,11 +60,6 @@ async function install() {
 }
 
 async function getDownloadUrl() {
-	const preview = core.getInput("preview");
-
-	core.debug(`OS: ${process.platform}`);
-	core.debug(`Architecture: ${ARCH}`);
-
 	const binaryName = `${getDownloadBinaryBaseName()}${getBinaryExtension()}`;
 	const tagName = await resolveReleaseTagName();
 
@@ -101,8 +96,6 @@ async function resolveReleaseTagName() {
 	if (releases == null) {
 		throw new Error("Failed to retrieve the list of releases");
 	}
-
-	core.debug(JSON.stringify(releases, null, " "));
 
 	const firstPreRelease = releases.find((release) => release.isPrerelease);
 
