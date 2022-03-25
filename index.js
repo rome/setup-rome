@@ -7,8 +7,10 @@ const io = require('@actions/io');
 const OS = process.env['RUNNER_OS'];
 const ARCH = process.env['RUNNER_ARCH'];
 
+console.log("Hello");
+
 async function main() {
-    console.log("Hello");
+    console.log("main");
     try {
         let path = await io.which("rome", true);
         core.info(`Use pre-installed Rome ${path}`);
