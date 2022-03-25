@@ -1,95 +1,105 @@
-const core = require('@actions/core');
-const github = require('@actions/github');
-const process = require('process');
-const toolCache = require('@actions/tool-cache');
-const io = require('@actions/io');
-const path = require('path');
-const fs = require('fs');
+const core = require("@actions/core");
+const github = require("@actions/github");
+const process = require("process");
+const toolCache = require("@actions/tool-cache");
+const io = require("@actions/io");
+const path = require("path");
+const fs = require("fs");
 
-const ARCH = process.env['RUNNER_ARCH'].toLowerCase();
-
-console.log("Hello");
+const ARCH = process.env["RUNNER_ARCH"].toLowerCase();
 
 async function main() {
-    console.log("main");
-    try {
-        let path = await io.which("rome", true);
-        core.info(`Use pre-installed Rome ${path}`);
-    } catch {
-        core.info("Rome is not installed, installing it now...");
-        try {
-            core.startGroup("Installing Rome");
-            await install();
-        } finally {
-            core.endGroup();
-        }
-    }
+	const romePath = await resolveRome();
+
+	if (romePath == null) {
+		core.info("Rome is not installed, installing it now...");
+		try {
+			core.startGroup("Installing Rome");
+			await install();
+		} finally {
+			core.endGroup();
+		}
+	} else {
+		core.info(`Use pre-installed Rome ${romePath}`);
+	}
 }
 
+/**
+ * Resolves the path to the rome binary.
+ * @returns {PromiseLike<string | null>} the path to the Rome binary or `null` if Rome isn't installed
+ */
+async function resolveRome() {
+	try {
+		return await io.which("rome", true);
+	} catch {
+		return null;
+	}
+}
+
+/**
+ * Installs rome and adds it to the path.
+ */
 async function install() {
-    // Get version of tool to be installed
-    const url = await getDownloadUrl();
+	// Get version of tool to be installed
+	const url = await getDownloadUrl();
 
-    const romeDirectory = path.join(_getTempDirectory(), ".rome_bin");
-    const romeBinary = path.join(romeDirectory, getBinaryName());
+	// Create a temp directory because `addPath` adds the directory and not the binary to the path.
+	const romeDirectory = path.join(_getTempDirectory(), ".rome_bin");
+	const romeBinary = path.join(romeDirectory, `rome${getBinaryExtension()}`);
 
-    core.debug("Download tool from '${url}'");
-    // Download the specific version of the tool, e.g. as a tarball
-    await toolCache.downloadTool(url, romeBinary);
+	core.debug("Download tool from '${url}'");
+	await toolCache.downloadTool(url, romeBinary);
 
-    if (process.platform == "linux" || process.platform == "darwin") {
-        fs.chmodSync(romeBinary, 0o755);
-    }
+	if (process.platform == "linux" || process.platform == "darwin") {
+		fs.chmodSync(romeBinary, 0o755);
+	}
 
-    // Expose the tool by adding it to the PATH
-    core.addPath(romeDirectory)
-}
-
-function getBinaryName() {
-    if (isWindows()) {
-        return "rome.exe"
-    }
-
-    return "rome";
-}
-
-function _getTempDirectory() {
-    const tempDirectory = process.env['RUNNER_TEMP'] || '';
-    return tempDirectory
-}
-
-function isWindows() {
-    return process.platform === "windows";
+	// Expose the tool by adding it to the PATH
+	core.addPath(romeDirectory);
 }
 
 async function getDownloadUrl() {
-    const preview = core.getInput('preview');
+	const preview = core.getInput("preview");
 
-    core.debug(`OS: ${process.platform}`);
-    core.debug(`Architecture: ${ARCH}`);
+	core.debug(`OS: ${process.platform}`);
+	core.debug(`Architecture: ${ARCH}`);
 
-    let url = `https://github.com/rome/tools/releases/download/v0.1.20220324/${encodeURIComponent(getDownloadBinaryName())}`;
+	const binaryName = `${getDownloadBinaryBaseName()}${getBinaryExtension()}`;
 
-    return url;
+	return `https://github.com/rome/tools/releases/download/v0.1.20220324/${encodeURIComponent(
+		binaryName,
+	)}`;
 }
 
-function getDownloadBinaryName() {
-    switch (process.platform) {
-        case "windows":
-        case "linux":
-        case "darwin":
-            return `rome-${process.platform}-${ARCH}`;
-        case "windows":
-            return `rome-windows-${ARCH}.exe`;
+function getDownloadBinaryBaseName() {
+	switch (process.platform) {
+		case "windows":
+		case "linux":
+		case "darwin":
+			return `rome-${process.platform}-${ARCH}`;
 
-        default:
-            core.error(`Unsupported platform ${process.platform}`);
-            throw new Error("Unsupported platform");
-    }
+		default:
+			core.error(`Unsupported platform ${process.platform}`);
+			throw new Error("Unsupported platform");
+	}
 }
 
-module.exports = main
+function getBinaryExtension() {
+	if (process.platform == "windows") {
+		return ".exe";
+	}
+	return "";
+}
+
+// Retrieves the temp directory. Copied from @actions/tool-cache
+function _getTempDirectory() {
+	io.mkdirP();
+	const tempDirectory = process.env["RUNNER_TEMP"] || "";
+	return tempDirectory;
+}
+
+module.exports = main;
 
 if (require.main === module) {
-    main();
+	main();
 }
