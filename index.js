@@ -10,18 +10,22 @@ const toolCache = require("@actions/tool-cache");
 const ARCH = process.env["RUNNER_ARCH"].toLowerCase();
 
 async function main() {
-	const romePath = await resolveRome();
+	try {
+		const romePath = await resolveRome();
 
-	if (romePath == null) {
-		core.info("Rome is not installed, installing it now...");
-		try {
-			core.startGroup("Installing Rome");
-			await install();
-		} finally {
-			core.endGroup();
+		if (romePath == null) {
+			core.info("Rome is not installed, installing it now...");
+			try {
+				core.startGroup("Installing Rome");
+				await install();
+			} finally {
+				core.endGroup();
+			}
+		} else {
+			core.info(`Use pre-installed Rome ${romePath}`);
 		}
-	} else {
-		core.info(`Use pre-installed Rome ${romePath}`);
+	} catch (error) {
+		core.setFailed(error);
 	}
 }
 
@@ -41,7 +45,6 @@ async function resolveRome() {
  * Installs rome and adds it to the path.
  */
 async function install() {
-	// Get version of tool to be installed
 	const url = await getDownloadUrl();
 
 	// Create a temp directory because `addPath` adds the directory and not the binary to the path.
@@ -55,7 +58,6 @@ async function install() {
 		fs.chmodSync(romeBinary, 0o755);
 	}
 
-	// Expose the tool by adding it to the PATH
 	core.addPath(romeDirectory);
 }
 
@@ -78,16 +80,16 @@ async function resolveReleaseTagName() {
 
 	const { repository } = await octokit.graphql(
 		`
-    { 
-        repository(owner: "rome", name: "tools") {
-            releases(orderBy: { field:CREATED_AT, direction:DESC }, first: 100) {
-                nodes {
-                    isPrerelease
-                    tagName
+        { 
+            repository(owner: "rome", name: "tools") {
+                releases(orderBy: { field:CREATED_AT, direction:DESC }, first: 100) {
+                    nodes {
+                        isPrerelease
+                        tagName
+                    }
                 }
             }
-        }
-    }`,
+        }`,
 		{},
 	);
 
@@ -115,8 +117,7 @@ function getDownloadBinaryBaseName() {
 			return `rome-${process.platform}-${ARCH}`;
 
 		default:
-			core.error(`Unsupported platform ${process.platform}`);
-			throw new Error("Unsupported platform");
+			throw new Error(`Unsupported platform ${process.platform}`);
 	}
 }
 
