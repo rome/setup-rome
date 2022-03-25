@@ -81,16 +81,25 @@ async function resolveReleaseTagName() {
 	const token = core.getInput("github-token", { required: true });
 	const octokit = github.getOctokit(token);
 
-	const releases = await octokit.rest.repos.listReleases({
-		owner: "rome",
-		repo: "tools",
-	});
+	const { repository: { releases } } = await octokit.graphql(
+		`
+        repository(owner:"rome", name:"tools") {
+            releases(orderBy: { field:CREATED_AT, direction:DESC }, first: 100) {
+                nodes {
+                    isPrerelease
+                    tagName
+                }
+            }
+        }`,
+		{},
+	);
 
 	core.debug(JSON.stringify(releases, null, " "));
 
 	const firstPreRelease = releases.find(
 		(release) => release.prerelease === true,
 	);
+
 	core.debug(JSON.stringify(firstPreRelease, null, "  "));
 	return firstPreRelease.tag;
 }
