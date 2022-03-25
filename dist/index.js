@@ -15,7 +15,8 @@ const ARCH = process.env['RUNNER_ARCH'];
 
 async function main() {
     try {
-        await io.which("rome", true);
+        let path = await io.which("rome", true);
+        core.info(`Use pre-installed Rome ${path}`);
     } catch {
         core.info("Rome is not installed, installing it now...");
         try {
