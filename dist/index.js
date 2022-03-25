@@ -115,7 +115,7 @@ async function resolveReleaseTagName() {
 
 function getDownloadBinaryBaseName() {
 	switch (process.platform) {
-		case "windows":
+		case "win32":
 		case "linux":
 		case "darwin":
 			return `rome-${process.platform}-${ARCH}`;
@@ -127,7 +127,7 @@ function getDownloadBinaryBaseName() {
 }
 
 function getBinaryExtension() {
-	if (process.platform == "windows") {
+	if (process.platform == "win32") {
 		return ".exe";
 	}
 	return "";
