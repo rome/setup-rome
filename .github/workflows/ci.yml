@@ -33,7 +33,7 @@ jobs:
       - name: Verify dist files are identical
         run: |
           set -e
-          if ! [ cmp -s ./dist/index.js ./dist/index.original.js ]
+          if ! cmp -s ./dist/index.js ./dist/index.original.js
           then
             echo "The 'index.js' file in the 'dist' directory is out of date. Run 'npm run build' to regenerate it and commit the changes."
             exit 1
