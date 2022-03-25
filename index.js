@@ -52,8 +52,8 @@ function isWindows() {
 async function getDownloadUrl() {
     const preview = core.getInput('preview');
 
-    core.debug(OS);
-    core.debug(ARCH);
+    core.debug(`OS: ${OS}`);
+    core.debug(`Architecture: ${ARCH}`);
 
     let extension = "";
 
@@ -61,7 +61,7 @@ async function getDownloadUrl() {
         extension = ".exe"
     }
 
-    let url = `https://github.com/rome/tools/releases/download/v0.1.20220324/rome-linux/${encodeURIComponent(OS)}-${encodeURIComponent(ARCH)}${extension}`;
+    let url = `https://github.com/rome/tools/releases/download/v0.1.20220324/rome-${encodeURIComponent(OS)}-${encodeURIComponent(ARCH)}${extension}`;
 
 
 
