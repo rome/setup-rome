@@ -86,16 +86,16 @@ async function resolveReleaseTagName() {
 
 	const { repository } = await octokit.graphql(
 		`
-    { 
-        repository(owner: "rome", name: "tools") {
-            releases(orderBy: { field:CREATED_AT, direction:DESC }, first: 100) {
-                nodes {
-                    isPrerelease
-                    tagName
+        { 
+            repository(owner: "rome", name: "tools") {
+                releases(orderBy: { field:CREATED_AT, direction:DESC }, first: 100) {
+                    nodes {
+                        isPrerelease
+                        tagName
+                    }
                 }
             }
-        }
-    }`,
+        }`,
 		{},
 	);
 
