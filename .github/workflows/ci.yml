@@ -33,6 +33,4 @@ jobs:
       - name: Verify dist files are identical
         run: |
           set -e
-          DIFF=$(diff ./dist/index.js ./dist/index.original.js)
-          if [ "$DIFF" != "" ]; then
-          fi
+          cmp ./dist/index.js ./dist/index.original.js || echo "The 'index.js' file in the 'dist' directory is out of date. Run 'npm run build' to regenerate it and commit the changes."
