@@ -4,8 +4,8 @@ const process = require('process');
 const toolCache = require('@actions/tool-cache');
 const io = require('@actions/io');
 
-const OS = process.env['RUNNER_OS'];
-const ARCH = process.env['RUNNER_ARCH'];
+const OS = process.env['RUNNER_OS'].toLowerCase();
+const ARCH = process.env['RUNNER_ARCH'].toLowerCase();
 
 console.log("Hello");
 
