@@ -30,19 +30,19 @@ async function install() {
     // Get version of tool to be installed
     const url = await getDownloadUrl();
 
-    const binaryDirectory = path.join(_getTempDirectory(), ".rome_bin");
-    const binaryPath = path.join(binaryDirectory, getBinaryName());
+    const romeDirectory = path.join(_getTempDirectory(), ".rome_bin");
+    const romeBinary = path.join(romeDirectory, getBinaryName());
 
     core.debug("Download tool from '${url}'");
     // Download the specific version of the tool, e.g. as a tarball
-    await toolCache.downloadTool(url, binaryPath);
+    await toolCache.downloadTool(url, romeBinary);
 
     if (process.platform == "linux" || process.platform == "darwin") {
-        fs.chmodSync(binaryPath, 0o755);
+        fs.chmodSync(romeBinary, 0o755);
     }
 
     // Expose the tool by adding it to the PATH
-    core.addPath(binaryPath)
+    core.addPath(romeDirectory)
 }
 
 function getBinaryName() {
