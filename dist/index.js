@@ -51,7 +51,6 @@ async function resolveRome() {
  * Installs rome and adds it to the path.
  */
 async function install() {
-	// Get version of tool to be installed
 	const url = await getDownloadUrl();
 
 	// Create a temp directory because `addPath` adds the directory and not the binary to the path.
