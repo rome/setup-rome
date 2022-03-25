@@ -9,7 +9,7 @@ jobs:
 
       - name: Install Rome
         id: hello
-        uses: octocat/setup-rome
+        uses: ./
         with:
           preview: true
 
