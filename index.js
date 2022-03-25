@@ -3,8 +3,9 @@ const github = require('@actions/github');
 const process = require('process');
 const toolCache = require('@actions/tool-cache');
 const io = require('@actions/io');
+const path = require('path');
+const fs = require('fs');
 
-const OS = process.env['RUNNER_OS'].toLowerCase();
 const ARCH = process.env['RUNNER_ARCH'].toLowerCase();
 
 console.log("Hello");
@@ -29,12 +30,19 @@ async function install() {
     // Get version of tool to be installed
     const url = await getDownloadUrl();
 
+    const binaryDirectory = path.join(_getTempDirectory(), ".rome_bin");
+    const binaryPath = path.join(binaryDirectory, getBinaryName());
+
     core.debug("Download tool from '${url}'");
     // Download the specific version of the tool, e.g. as a tarball
-    const pathToBinary = await toolCache.downloadTool(url, getBinaryName());
+    await toolCache.downloadTool(url, binaryPath);
+
+    if (process.platform == "linux" || process.platform == "darwin") {
+        fs.chmod(binaryPath, 0o755);
+    }
 
     // Expose the tool by adding it to the PATH
-    core.addPath(pathToBinary)
+    core.addPath(binaryPath)
 }
 
 function getBinaryName() {
@@ -45,27 +53,39 @@ function getBinaryName() {
     return "rome";
 }
 
+function _getTempDirectory() {
+    const tempDirectory = process.env['RUNNER_TEMP'] || '';
+    return tempDirectory
+}
+
 function isWindows() {
-    return ARCH === "windows";
+    return process.platform === "windows";
 }
 
 async function getDownloadUrl() {
     const preview = core.getInput('preview');
 
-    core.debug(`OS: ${OS}`);
+    core.debug(`OS: ${process.platform}`);
     core.debug(`Architecture: ${ARCH}`);
 
-    let extension = "";
-
-    if (isWindows()) {
-        extension = ".exe"
-    }
-
-    let url = `https://github.com/rome/tools/releases/download/v0.1.20220324/rome-${encodeURIComponent(OS)}-${encodeURIComponent(ARCH)}${extension}`;
-
-
+    let url = `https://github.com/rome/tools/releases/download/v0.1.20220324/${encodeURIComponent(getDownloadBinaryName())}`;
 
     return url;
+}
+
+function getDownloadBinaryName() {
+    switch (process.platform) {
+        case "windows":
+        case "linux":
+        case "darwin":
+            return `rome-${process.platform}-${ARCH}`;
+        case "windows":
+            return `rome-windows-${ARCH}.exe`;
+
+        default:
+            core.error(`Unsupported platform ${process.platform}`);
+            throw new Error("Unsupported platform");
+    }
 }
 
 module.exports = main
