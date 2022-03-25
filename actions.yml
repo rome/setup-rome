@@ -1,0 +1,13 @@
+name: 'Setup Rome'
+description: "Installs Rome"
+author: "Rome Tools Inc."
+branding:
+  color: yellow
+  icon: play
+inputs:
+  preview:
+    description: "Whether to install preview versions of Rome."
+    default: false
+runs:
+  using: "node16"
+  main: "index.js"
