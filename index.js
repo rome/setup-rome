@@ -1,3 +1,4 @@
+const assert = require("assert");
 const fs = require("fs");
 const path = require("path");
 const process = require("process");
@@ -6,8 +7,6 @@ const core = require("@actions/core");
 const io = require("@actions/io");
 const github = require("@actions/github");
 const toolCache = require("@actions/tool-cache");
-
-const ARCH = process.env["RUNNER_ARCH"].toLowerCase();
 
 async function main() {
 	const romePath = await resolveRome();
@@ -112,11 +111,29 @@ function getDownloadBinaryBaseName() {
 		case "win32":
 		case "linux":
 		case "darwin":
-			return `rome-${process.platform}-${ARCH}`;
+			const arch = getRunnerArchitecture();
+			return `rome-${process.platform}-${arch}`;
 
 		default:
 			core.error(`Unsupported platform ${process.platform}`);
 			throw new Error("Unsupported platform");
+	}
+}
+
+function getRunnerArchitecture() {
+	const arch = process.env["RUNNER_ARCH"];
+	assert(
+		arch,
+		"Expected the arch to be exposed in the RUNNER_ARCH environment variable.",
+	);
+
+	switch (arch) {
+		case "X64":
+		case "ARM64":
+			return arch.toLocaleLowerCase();
+
+		default:
+			throw new Error(`Unsupported architecture ${arch}.`);
 	}
 }
 
