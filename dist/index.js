@@ -12232,7 +12232,7 @@ async function install() {
 		throw error;
 	}
 
-	if (process.platform == "linux" || process.platform == "darwin") {
+	if (process.platform === "linux" || process.platform === "darwin") {
 		fs.chmodSync(romeBinary, 0o755);
 	}
 
@@ -12256,6 +12256,11 @@ async function getDownloadUrl(tagName) {
 
 async function resolveReleaseTagName() {
 	const version = core.getInput("version");
+
+	if (version === "latest") {
+		return "latest";
+	}
+
 	switch (version) {
 		case "latest":
 			return "latest";
@@ -12334,7 +12339,7 @@ function getRunnerArchitecture() {
 }
 
 function getBinaryExtension() {
-	if (process.platform == "win32") {
+	if (process.platform === "win32") {
 		return ".exe";
 	}
 	return "";
@@ -12356,7 +12361,10 @@ function _getTempDirectory() {
 module.exports = main;
 
 if (require.main === require.cache[eval('__filename')]) {
-	main();
+	main().catch((err) => {
+		console.log(error);
+		process.exit(1);
+	});
 }
 
 
