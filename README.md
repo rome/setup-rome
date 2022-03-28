@@ -10,7 +10,7 @@ See [action.yml](./action.yml)
 
 ```yml
 steps:
-    - uses: rome/setup-rome@v0.0.1
+    - uses: rome/setup-rome@v0.1
     - run: rome --help
 ```
 
@@ -22,7 +22,7 @@ Installs the latest *preview* version of Rome and adds it to the path.
 
 ```yml
 steps:
-    - uses: rome/setup-rome@v0.0.1
+    - uses: rome/setup-rome@v0.1
       with: 
         preview: true
     - run: rome --help
