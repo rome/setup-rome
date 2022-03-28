@@ -69,8 +69,12 @@ async function install() {
 		) {
 			core.error(error);
 			const version = core.getInput("version");
+			const releaseUrl = `https://github.com/rome/tools/releases/tag/v${encodeURIComponent(
+				version,
+			)}`;
+
 			throw new Error(
-				`Failed to retrieve the binary for Rome version ${version} (resolved to tag '${tagName}'). Is ${version} a valid Rome version?`,
+				`Failed to retrieve the binary for Rome version '${version}' (resolved to tag '${tagName}'). Is ${version} (${releaseUrl}) a valid Rome version?`,
 			);
 		}
 
