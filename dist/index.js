@@ -50,14 +50,38 @@ async function resolveRome() {
  * Installs rome and adds it to the path.
  */
 async function install() {
-	const url = await getDownloadUrl();
-
 	// Create a temp directory because `addPath` adds the directory and not the binary to the path.
 	const romeDirectory = path.join(_getTempDirectory(), ".rome_bin");
 	const romeBinary = path.join(romeDirectory, `rome${getBinaryExtension()}`);
 
-	core.debug(`Download tool from '${url}' to ${romeBinary}.`);
-	await toolCache.downloadTool(url, romeBinary);
+	const tagName = await resolveReleaseTagName();
+	const url = await getDownloadUrl(tagName);
+
+	try {
+		core.debug(`Download tool from '${url}' to ${romeBinary}.`);
+		await toolCache.downloadTool(url, romeBinary);
+	} catch (error) {
+		const statusCode = error.httpStatusCode;
+		if (
+			typeof (statusCode) === "number" &&
+			statusCode >= 400 &&
+			statusCode < 500
+		) {
+			core.error(error);
+			const version = core.getInput("version");
+			const releaseUrl = `https://github.com/rome/tools/releases/${encodeURIComponent(
+				tagName,
+			)}`;
+
+			throw new Error(
+				`Failed to retrieve the binary for Rome version '${version}'. Is ${version} (${releaseUrl}) a valid (rusty-) Rome version?`,
+			);
+		}
+
+		core.error("Failed to retrieve the Rome binary from '${url}'.");
+
+		throw error;
+	}
 
 	if (process.platform == "linux" || process.platform == "darwin") {
 		fs.chmodSync(romeBinary, 0o755);
@@ -66,9 +90,8 @@ async function install() {
 	core.addPath(romeDirectory);
 }
 
-async function getDownloadUrl() {
+async function getDownloadUrl(tagName) {
 	const binaryName = `${getDownloadBinaryBaseName()}${getBinaryExtension()}`;
-	const tagName = await resolveReleaseTagName();
 
 	return `https://github.com/rome/tools/releases/download/${encodeURIComponent(
 		tagName,
@@ -76,10 +99,23 @@ async function getDownloadUrl() {
 }
 
 async function resolveReleaseTagName() {
-	if (!core.getBooleanInput("preview")) {
+	const version = core.getInput("version");
+
+	if (version == "latest") {
 		return "latest";
 	}
 
+	switch (version) {
+		case "latest":
+			return "latest";
+		case "preview":
+			return await resolveLatestPreviewVersion();
+		default:
+			return `v${version}`;
+	}
+}
+
+async function resolveLatestPreviewVersion() {
 	const token = core.getInput("github-token", { required: true });
 	const octokit = github.getOctokit(token);
 
@@ -110,6 +146,8 @@ async function resolveReleaseTagName() {
 		core.error("Failed to retrieve pre-release, falling back to latest.");
 		return "latest";
 	}
+
+	core.info(`Resolved latest preview version to ${firstPreRelease.tagName}`);
 
 	return firstPreRelease.tagName;
 }
