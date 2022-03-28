@@ -19,7 +19,7 @@ jobs:
     strategy:
       matrix:
         version: ["latest", "0.3.20220325", "preview"]
-      runs-on: "ubuntu-latest"
+    runs-on: "ubuntu-latest"
     steps:
       - uses: actions/checkout@v2
       - name: Install Rome
