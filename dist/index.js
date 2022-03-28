@@ -4,6 +4,7 @@
 /***/ 2932:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
+const assert = __nccwpck_require__(9491);
 const fs = __nccwpck_require__(7147);
 const path = __nccwpck_require__(1017);
 const process = __nccwpck_require__(7282);
@@ -12,8 +13,6 @@ const core = __nccwpck_require__(2186);
 const io = __nccwpck_require__(7436);
 const github = __nccwpck_require__(5438);
 const toolCache = __nccwpck_require__(7784);
-
-const ARCH = process.env["RUNNER_ARCH"].toLowerCase();
 
 async function main() {
 	try {
@@ -120,10 +119,28 @@ function getDownloadBinaryBaseName() {
 		case "win32":
 		case "linux":
 		case "darwin":
-			return `rome-${process.platform}-${ARCH}`;
+			const arch = getRunnerArchitecture();
+			return `rome-${process.platform}-${arch}`;
 
 		default:
 			throw new Error(`Unsupported platform ${process.platform}`);
+	}
+}
+
+function getRunnerArchitecture() {
+	const arch = process.env["RUNNER_ARCH"];
+	assert(
+		arch,
+		"Expected the arch to be exposed in the RUNNER_ARCH environment variable.",
+	);
+
+	switch (arch) {
+		case "X64":
+		case "ARM64":
+			return arch.toLocaleLowerCase();
+
+		default:
+			throw new Error(`Unsupported architecture ${arch}.`);
 	}
 }
 
