@@ -55,8 +55,9 @@ async function install() {
 		core.debug(`Download tool from '${url}' to ${romeBinary}.`);
 		await toolCache.downloadTool(url, romeBinary);
 	} catch (error) {
+		core.info(JSON.stringify(error, null, "  "));
 		if (
-			typeof error.statusCode == "number" &&
+			typeof (error.statusCode) === "number" &&
 			error.statusCode >= 400 &&
 			error.statusCode < 500
 		) {
