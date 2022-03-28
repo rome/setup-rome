@@ -11,7 +11,7 @@ jobs:
       - name: Install Rome
         uses: ./
         with:
-          version: latest
+          version: preview
 
       - run: rome --help
 

@@ -50,14 +50,20 @@ async function resolveRome() {
  * Installs rome and adds it to the path.
  */
 async function install() {
-	const url = await getDownloadUrl();
-
 	// Create a temp directory because `addPath` adds the directory and not the binary to the path.
 	const romeDirectory = path.join(_getTempDirectory(), ".rome_bin");
 	const romeBinary = path.join(romeDirectory, `rome${getBinaryExtension()}`);
 
-	core.debug(`Download tool from '${url}' to ${romeBinary}.`);
-	await toolCache.downloadTool(url, romeBinary);
+	const tagName = await resolveReleaseTagName();
+	const url = await getDownloadUrl(tagName);
+
+	try {
+		core.debug(`Download tool from '${url}' to ${romeBinary}.`);
+		await toolCache.downloadTool(url, romeBinary);
+	} catch (error) {
+		console.log(error);
+		throw error;
+	}
 
 	if (process.platform == "linux" || process.platform == "darwin") {
 		fs.chmodSync(romeBinary, 0o755);
@@ -66,9 +72,8 @@ async function install() {
 	core.addPath(romeDirectory);
 }
 
-async function getDownloadUrl() {
+async function getDownloadUrl(tagName) {
 	const binaryName = `${getDownloadBinaryBaseName()}${getBinaryExtension()}`;
-	const tagName = await resolveReleaseTagName();
 
 	return `https://github.com/rome/tools/releases/download/${encodeURIComponent(
 		tagName,
@@ -123,6 +128,8 @@ async function resolveLatestPreviewVersion() {
 		core.error("Failed to retrieve pre-release, falling back to latest.");
 		return "latest";
 	}
+
+	core.info(`Resolved latest preview version to ${firstPreRelease.tagName}`);
 
 	return firstPreRelease.tagName;
 }
