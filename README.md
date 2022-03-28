@@ -14,7 +14,7 @@ steps:
     - run: rome --help
 ```
 
-Installs the specivied version of Rome and adds it to the path. The version can be one of:
+Installs the specified version of Rome and adds it to the path. The version can be one of:
 
 * `latest`: Installs the latest stable version of Rome. Be mindful that Rome hasn't reached the `1.0.0` version yet, and thus, even minor or patch releases can contain breaking changes. 
 * `preview`: Installs the latest preview version of Rome.
