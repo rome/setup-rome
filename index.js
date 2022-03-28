@@ -68,7 +68,7 @@ async function install() {
 			)}`;
 
 			throw new Error(
-				`Failed to retrieve the binary for Rome version '${version}' (resolved to tag '${tagName}'). Is ${version} (${releaseUrl}) a valid Rome version?`,
+				`Failed to retrieve the binary for Rome version '${version}'. Is ${version} (${releaseUrl}) a valid (rusty-) Rome version?`,
 			);
 		}
 
