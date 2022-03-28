@@ -55,7 +55,20 @@ async function install() {
 		core.debug(`Download tool from '${url}' to ${romeBinary}.`);
 		await toolCache.downloadTool(url, romeBinary);
 	} catch (error) {
-		console.log(error);
+		if (
+			typeof error.statusCode == "number" &&
+			error.statusCode >= 400 &&
+			error.statusCode < 500
+		) {
+			core.error(error);
+			const version = core.getInput("version");
+			throw new Error(
+				`Failed to retrieve the binary for Rome version ${version} (resolved to tag '${tagName}'). Is ${version} a valid Rome version?`,
+			);
+		}
+
+		core.error("Failed to retrieve the Rome binary.");
+
 		throw error;
 	}
 
