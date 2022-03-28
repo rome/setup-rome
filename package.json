@@ -1,12 +1,12 @@
 {
   "name": "setup-rome",
   "version": "0.0.1",
-  "description": "\"GitHub Action to install Rome\"",
-  "main": "index.js",
+  "description": "GitHub Action to install Rome",
+  "main": "src/index.js",
   "private": true,
   "scripts": {
-    "build": "ncc build index.js --license LICENSE",
-    "start": "ncc build --watch index.js --license LICENSE"
+    "build": "ncc build src/index.js --license LICENSE",
+    "start": "ncc build --watch src/index.js --license LICENSE"
   },
   "keywords": [
     "actions",
