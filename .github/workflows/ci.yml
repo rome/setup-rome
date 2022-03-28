@@ -20,13 +20,13 @@ jobs:
       matrix:
         version: ["latest", "0.3.20220325", "preview"]
       runs-on: "ubuntu-latest"
-      steps:
-        - uses: actions/checkout@v2
-        - name: Install Rome
-          uses: ./
-          with:
-            version: ${{ matrix.version }}
-        - run: rome --help
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Rome
+        uses: ./
+        with:
+          version: ${{ matrix.version }}
+      - run: rome --help
   
   build:
     runs-on: ubuntu-latest
