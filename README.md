@@ -14,11 +14,11 @@ steps:
     - run: rome --help
 ```
 
-Installs the latest *stable* version and adds Rome to the path.
+Installs the latest *stable* version of Rome and adds it to the path.
 
 ### Preview version
 
-Installs the latest *preview* version and adds Rome to the path.
+Installs the latest *preview* version of Rome and adds it to the path.
 
 ```yml
 steps:
