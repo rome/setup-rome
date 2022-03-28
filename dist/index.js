@@ -69,7 +69,7 @@ async function install() {
 		) {
 			core.error(error);
 			const version = core.getInput("version");
-			const releaseUrl = `https://github.com/rome/tools/releases/tag/v${encodeURIComponent(
+			const releaseUrl = `https://github.com/rome/tools/releases/${encodeURIComponent(
 				tagName,
 			)}`;
 
