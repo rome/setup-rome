@@ -76,10 +76,23 @@ async function getDownloadUrl() {
 }
 
 async function resolveReleaseTagName() {
-	if (!core.getBooleanInput("preview")) {
+	const version = core.getInput("version");
+
+	if (version == "latest") {
 		return "latest";
 	}
 
+	switch (version) {
+		case "latest":
+			return "latest";
+		case "preview":
+			return await resolveLatestPreviewVersion();
+		default:
+			return `v${version}`;
+	}
+}
+
+async function resolveLatestPreviewVersion() {
 	const token = core.getInput("github-token", { required: true });
 	const octokit = github.getOctokit(token);
 

@@ -5,9 +5,12 @@ branding:
   color: yellow
   icon: play
 inputs:
-  preview:
-    description: "Whether to install preview versions of Rome."
-    default: false
+  version:
+    description: |
+      The version of Rome to install. 
+      Supports 'latest' for the latest stable release, 
+      'preview' for the latest preview release, or a version number with the format 'x.x.x' for a specific Rome version."
+    required: true
   github-token:
     description: The GitHub token used to create an authenticated client
     default: ${{ github.token }}
