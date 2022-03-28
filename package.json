@@ -22,5 +22,8 @@
   },
   "devDependencies": {
     "@vercel/ncc": "^0.33.3"
+  },
+  "engines": {
+    "node": "16.*.*"
   }
 }
