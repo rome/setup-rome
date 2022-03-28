@@ -18,7 +18,7 @@ jobs:
   version-support:
     strategy:
       matrix:
-        version: ["latest", "0.3.20220325", "preview"]
+        version: ["0.3.20220325", "preview"]
     runs-on: "ubuntu-latest"
     steps:
       - uses: actions/checkout@v2
