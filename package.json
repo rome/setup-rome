@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "private": true,
   "scripts": {
-    "build": "ncc build src/index.js --license LICENSE",
+    "build": "ncc build src/index.js --license LICENSE --minify",
     "start": "ncc build --watch src/index.js --license LICENSE"
   },
   "keywords": [
