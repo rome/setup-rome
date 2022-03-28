@@ -33,7 +33,3 @@ steps:
 
 * OS: Windows, Linux, MacOS,
 * Architecture: x64, ARM64
-
-
-## Contributing
-
