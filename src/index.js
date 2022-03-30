@@ -77,7 +77,7 @@ async function install() {
 		throw error;
 	}
 
-	if (process.platform == "linux" || process.platform == "darwin") {
+	if (process.platform === "linux" || process.platform === "darwin") {
 		fs.chmodSync(romeBinary, 0o755);
 	}
 
@@ -179,7 +179,7 @@ function getRunnerArchitecture() {
 }
 
 function getBinaryExtension() {
-	if (process.platform == "win32") {
+	if (process.platform === "win32") {
 		return ".exe";
 	}
 	return "";
@@ -201,5 +201,9 @@ function _getTempDirectory() {
 module.exports = main;
 
 if (require.main === module) {
-	main();
+	main()
+		.catch((err) => {
+			console.log(error);
+			process.exit(1);
+		});
 }
