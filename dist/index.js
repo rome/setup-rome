@@ -12255,6 +12255,7 @@ async function getDownloadUrl(tagName) {
 }
 
 async function resolveReleaseTagName() {
+	const version = core.getInput("version");
 	switch (version) {
 		case "latest":
 			return "latest";
