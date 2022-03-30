@@ -85,7 +85,15 @@ async function install() {
 }
 
 async function getDownloadUrl(tagName) {
+	const version = core.getInput("version");
 	const binaryName = `${getDownloadBinaryBaseName()}${getBinaryExtension()}`;
+
+	if (version === "latest") {
+		// latest must come before the `download` segment, that's why latest is handled separately.
+		return `https://github.com/rome/tools/releases/latest/download/${encodeURIComponent(
+			binaryName,
+		)}`;
+	}
 
 	return `https://github.com/rome/tools/releases/download/${encodeURIComponent(
 		tagName,
@@ -93,12 +101,6 @@ async function getDownloadUrl(tagName) {
 }
 
 async function resolveReleaseTagName() {
-	const version = core.getInput("version");
-
-	if (version == "latest") {
-		return "latest";
-	}
-
 	switch (version) {
 		case "latest":
 			return "latest";
