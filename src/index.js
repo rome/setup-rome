@@ -87,13 +87,6 @@ async function install() {
 async function getDownloadUrl(tagName) {
 	const binaryName = `${getDownloadBinaryBaseName()}${getBinaryExtension()}`;
 
-	if (tagName === "latest") {
-		// latest must come before the `download` segment, that's why latest is handled separately.
-		return `https://github.com/rome/tools/releases/latest/download/${encodeURIComponent(
-			binaryName,
-		)}`;
-	}
-
 	return `https://github.com/rome/tools/releases/download/${encodeURIComponent(
 		tagName,
 	)}/${encodeURIComponent(binaryName)}`;
@@ -103,15 +96,20 @@ async function resolveReleaseTagName() {
 	const version = core.getInput("version");
 	switch (version) {
 		case "latest":
-			return "latest";
+			return resolveVersion(true);
 		case "preview":
-			return await resolveLatestPreviewVersion();
+			return await resolveVersion(false);
 		default:
 			return `v${version}`;
 	}
 }
 
-async function resolveLatestPreviewVersion() {
+/**
+ *
+ * @param {boolean} latest
+ * @returns {Promise<String>}
+ */
+async function resolveVersion(latest) {
 	const token = core.getInput("github-token", { required: true });
 	const octokit = github.getOctokit(token);
 
@@ -130,17 +128,28 @@ async function resolveLatestPreviewVersion() {
 		{},
 	);
 
-	const releases = repository?.releases?.nodes;
+	// we filter releases that have "cli" in their tag name
+	const releases = repository?.releases?.nodes.filter(
+		(release) => {
+			return release.tagName.toLowerCase().includes("cli");
+		},
+	);
 
 	if (releases == null) {
 		throw new Error("Failed to retrieve the list of releases");
+	}
+
+	if (latest) {
+		core.info(`Fetching latest version: ${releases[0].tagName}`);
+		return releases[0].tagName;
 	}
 
 	const firstPreRelease = releases.find((release) => release.isPrerelease);
 
 	if (firstPreRelease == null) {
 		core.error("Failed to retrieve pre-release, falling back to latest.");
-		return "latest";
+		core.info(`Fetching latest version: ${releases[0].tagName}`);
+		return releases[0].tagName;
 	}
 
 	core.info(`Resolved latest preview version to ${firstPreRelease.tagName}`);

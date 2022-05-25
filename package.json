@@ -6,7 +6,8 @@
   "private": true,
   "scripts": {
     "build": "ncc build src/index.js --license LICENSE --minify",
-    "start": "ncc build --watch src/index.js --license LICENSE"
+    "start": "ncc build --watch src/index.js --license LICENSE",
+    "format": "rome format ./src --write"
   },
   "keywords": [
     "actions",
@@ -21,7 +22,8 @@
     "@actions/tool-cache": "^1.7.2"
   },
   "devDependencies": {
-    "@vercel/ncc": "^0.33.3"
+    "@vercel/ncc": "^0.33.3",
+    "rome": "^0.5.0-next"
   },
   "engines": {
     "node": "16.*.*"
