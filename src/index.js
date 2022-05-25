@@ -130,9 +130,7 @@ async function resolveVersion(latest) {
 
 	// we filter releases that have "cli" in their tag name
 	const releases = repository?.releases?.nodes.filter(
-		(release) => {
-			return release.tagName.toLowerCase().includes("cli");
-		},
+		(release) => release.tagName.toLowerCase().includes("cli"),
 	);
 
 	if (releases == null) {
@@ -140,15 +138,20 @@ async function resolveVersion(latest) {
 	}
 
 	if (latest) {
-		core.info(`Fetching latest version: ${releases[0].tagName}`);
-		return releases[0].tagName;
+		// TODO: set !release.isPrerelease once we remove "-next" from the version of the package.json
+		// of rome. At the moment GitHub see them as prerelease
+		let first_prod_release = releases.find((release) => release.isPrerelease);
+		core.info(
+			`Chosen first production release with version ${first_prod_release.tagName}`,
+		);
+		return first_prod_release.tagName;
 	}
 
 	const firstPreRelease = releases.find((release) => release.isPrerelease);
 
 	if (firstPreRelease == null) {
 		core.error("Failed to retrieve pre-release, falling back to latest.");
-		core.info(`Fetching latest version: ${releases[0].tagName}`);
+		core.info(`Choosing latest release with version ${releases[0].tagName}`);
 		return releases[0].tagName;
 	}
 
