@@ -6,9 +6,21 @@ This action sets up Rome for use in actions by downloading it and adding it to t
 
 See [action.yml](./action.yml)
 
+With latest version:
+
 ```yml
 steps:
-    - uses: rome/setup-rome@v0.1
+    - uses: rome/setup-rome@latest
+      with:
+        version: latest 
+    - run: rome --help
+```
+
+With a specific version:
+
+```yml
+steps:
+    - uses: rome/setup-rome@v0.3
       with:
         version: latest 
     - run: rome --help
@@ -27,7 +39,7 @@ Installs the specified version of Rome and adds it to the path. The version can 
 
 ```yml
 steps:
-    - uses: rome/setup-rome@v0.1
+    - uses: rome/setup-rome@latest
       with:
         version: 0.4.0
     - uses: actions/checkout@v2
