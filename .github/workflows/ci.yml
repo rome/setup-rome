@@ -1,4 +1,7 @@
 on: [pull_request]
+  workflow_dispatch:
+  schedule:
+   - cron: '0 1 * * *' # every day 1:00 AM
 jobs:
   os-compatibility:
     strategy:
