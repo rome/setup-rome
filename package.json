@@ -23,7 +23,7 @@
   },
   "devDependencies": {
     "@vercel/ncc": "^0.33.3",
-    "rome": "^0.5.0-next"
+    "rome": "^0.7.0-next"
   },
   "engines": {
     "node": "16.*.*"

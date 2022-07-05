@@ -211,9 +211,8 @@ function _getTempDirectory() {
 module.exports = main;
 
 if (require.main === module) {
-	main()
-		.catch((err) => {
-			console.log(error);
-			process.exit(1);
-		});
+	main().catch((err) => {
+		console.log(error);
+		process.exit(1);
+	});
 }
