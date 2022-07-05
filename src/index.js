@@ -138,9 +138,7 @@ async function resolveVersion(latest) {
 	}
 
 	if (latest) {
-		// TODO: set !release.isPrerelease once we remove "-next" from the version of the package.json
-		// of rome. At the moment GitHub see them as prerelease
-		let first_prod_release = releases.find((release) => release.isPrerelease);
+		let first_prod_release = releases.find((release) => !release.isPrerelease);
 		core.info(
 			`Chosen first production release with version ${first_prod_release.tagName}`,
 		);
@@ -213,9 +211,8 @@ function _getTempDirectory() {
 module.exports = main;
 
 if (require.main === module) {
-	main()
-		.catch((err) => {
-			console.log(error);
-			process.exit(1);
-		});
+	main().catch((err) => {
+		console.log(error);
+		process.exit(1);
+	});
 }

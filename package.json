@@ -1,6 +1,6 @@
 {
   "name": "setup-rome",
-  "version": "0.0.1",
+  "version": "0.4.0",
   "description": "GitHub Action to install Rome",
   "main": "src/index.js",
   "private": true,
@@ -23,7 +23,7 @@
   },
   "devDependencies": {
     "@vercel/ncc": "^0.33.3",
-    "rome": "^0.5.0-next"
+    "rome": "^0.7.0-next"
   },
   "engines": {
     "node": "16.*.*"
