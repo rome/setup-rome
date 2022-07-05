@@ -60,6 +60,6 @@ jobs:
       - name: Install Rome
         uses: ./
         with:
-          version: preview
+          version: latest
       - name: Check formatting
         run: rome ci src
