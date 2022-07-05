@@ -62,4 +62,4 @@ jobs:
         with:
           version: preview
       - name: Check formatting
-        run: rome format --ci src
+        run: rome ci src
