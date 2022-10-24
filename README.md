@@ -10,7 +10,7 @@ With latest version:
 
 ```yml
 steps:
-    - uses: rome/setup-rome@latest
+    - uses: rome/setup-rome@0.4
       with:
         version: latest 
     - run: rome --help
@@ -20,9 +20,9 @@ With a specific version:
 
 ```yml
 steps:
-    - uses: rome/setup-rome@v0.3
+    - uses: rome/setup-rome@v0.4
       with:
-        version: latest 
+        version: 0.10.0 
     - run: rome --help
 ```
 
@@ -30,7 +30,7 @@ Installs the specified version of Rome and adds it to the path. The version can 
 
 * `latest`: Installs the latest stable version of Rome. Be mindful that Rome hasn't reached the `1.0.0` version yet, and thus, even minor or patch releases can contain breaking changes. 
 * `preview`: Installs the latest preview version of Rome.
-* `0.4.0`: Installs the version 0.4.0. Semver ranges aren't supported at the time being.
+* `0.10.0`: Installs the version 0.10.0. Semver ranges aren't supported at the time being.
 
 
 ## Scenarios
