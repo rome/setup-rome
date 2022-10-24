@@ -39,9 +39,9 @@ Installs the specified version of Rome and adds it to the path. The version can 
 
 ```yml
 steps:
-    - uses: rome/setup-rome@latest
+    - uses: rome/setup-rome@v0.4
       with:
-        version: 0.4.0
+        version: 0.10.0
     - uses: actions/checkout@v2
     - run: rome format --ci .
 ```
