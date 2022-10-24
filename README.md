@@ -10,7 +10,7 @@ With latest version:
 
 ```yml
 steps:
-    - uses: rome/setup-rome@0.4
+    - uses: rome/setup-rome@v0.4
       with:
         version: latest 
     - run: rome --help
