@@ -155,7 +155,10 @@ async function resolveVersion(version) {
 	}
 
 	// fetch specific version (x.y.z)
-	const release = releases.find((release) => release.tagName.includes(version));
+	const release = releases.find(
+		// using .includes() here causes false positives on pre-releases
+		(release) => release.tagName.toLowerCase() === `cli/v${version}`,
+	);
 	if (release == null) {
 		throw new Error(`Unable to find a release for the version ${version}`);
 	}
