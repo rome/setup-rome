@@ -92,7 +92,7 @@ async function getDownloadUrl(tagName) {
 	)}/${encodeURIComponent(binaryName)}`;
 }
 
-async function resolveReleaseTagName() {
+function resolveReleaseTagName() {
 	const version = core.getInput("version");
 	return resolveVersion(version);
 }
