@@ -92,24 +92,17 @@ async function getDownloadUrl(tagName) {
 	)}/${encodeURIComponent(binaryName)}`;
 }
 
-async function resolveReleaseTagName() {
+function resolveReleaseTagName() {
 	const version = core.getInput("version");
-	switch (version) {
-		case "latest":
-			return resolveVersion(true);
-		case "preview":
-			return await resolveVersion(false);
-		default:
-			return `v${version}`;
-	}
+	return resolveVersion(version);
 }
 
 /**
  *
- * @param {boolean} latest
+ * @param {string} version
  * @returns {Promise<String>}
  */
-async function resolveVersion(latest) {
+async function resolveVersion(version) {
 	const token = core.getInput("github-token", { required: true });
 	const octokit = github.getOctokit(token);
 
@@ -137,7 +130,8 @@ async function resolveVersion(latest) {
 		throw new Error("Failed to retrieve the list of releases");
 	}
 
-	if (latest) {
+	// fetch latest version
+	if (version === "latest") {
 		let first_prod_release = releases.find((release) => !release.isPrerelease);
 		core.info(
 			`Chosen first production release with version ${first_prod_release.tagName}`,
@@ -145,17 +139,32 @@ async function resolveVersion(latest) {
 		return first_prod_release.tagName;
 	}
 
-	const firstPreRelease = releases.find((release) => release.isPrerelease);
+	// fetch latest preview version
+	if (version === "preview") {
+		const firstPreRelease = releases.find((release) => release.isPrerelease);
 
-	if (firstPreRelease == null) {
-		core.error("Failed to retrieve pre-release, falling back to latest.");
-		core.info(`Choosing latest release with version ${releases[0].tagName}`);
-		return releases[0].tagName;
+		if (firstPreRelease == null) {
+			core.error("Failed to retrieve pre-release, falling back to latest.");
+			core.info(`Choosing latest release with version ${releases[0].tagName}`);
+			return releases[0].tagName;
+		}
+
+		core.info(`Resolved latest preview version to ${firstPreRelease.tagName}`);
+
+		return firstPreRelease.tagName;
 	}
 
-	core.info(`Resolved latest preview version to ${firstPreRelease.tagName}`);
+	// fetch specific version (x.y.z)
+	const release = releases.find(
+		// using .includes() here causes false positives on pre-releases
+		(release) => release.tagName.toLowerCase() === `cli/v${version}`,
+	);
+	if (release == null) {
+		throw new Error(`Unable to find a release for the version ${version}`);
+	}
 
-	return firstPreRelease.tagName;
+	core.info(`Resolved version ${version} to ${release.tagName}`);
+	return release.tagName;
 }
 
 function getDownloadBinaryBaseName() {
