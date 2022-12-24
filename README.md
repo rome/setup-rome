@@ -28,7 +28,7 @@ steps:
 
 Installs the specified version of Rome and adds it to the path. The version can be one of:
 
-* `latest`: Installs the latest stable version of Rome. Be mindful that Rome hasn't reached the `1.0.0` version yet, and thus, even minor or patch releases can contain breaking changes. 
+* `latest`: Installs the latest stable version of Rome.
 * `preview`: Installs the latest preview version of Rome.
 * `0.10.0`: Installs the version 0.10.0. Semver ranges aren't supported at the time being.
 
@@ -41,9 +41,9 @@ Installs the specified version of Rome and adds it to the path. The version can 
 steps:
     - uses: rome/setup-rome@v0.4
       with:
-        version: 0.10.0
+        version: 11.0.0
     - uses: actions/checkout@v2
-    - run: rome format --ci .
+    - run: rome ci .
 ```
 
 Checks the formatting of all supported files in your repository. Fails the build if a file doesn't match the expected formatting. 
